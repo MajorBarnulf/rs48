@@ -1,7 +1,7 @@
 use std::{error::Error, fmt::Display};
 
 use super::{
-	controller::{Controller, Move, PlayerController},
+	controller::{Controller, ControllerError, Move, PlayerController},
 	grid::Grid,
 };
 
@@ -34,20 +34,27 @@ impl Default for Rules {
 }
 
 #[derive(Debug)]
-pub enum Err2048 {
+pub enum GameError {
 	GridIsFull,
+	ControllerError(ControllerError),
 }
 
-impl Display for Err2048 {
-	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		let msg = match self {
-			&Self::GridIsFull => "grid is full",
-		};
-		f.write_str(msg)
+impl From<ControllerError> for GameError {
+	fn from(error: ControllerError) -> Self {
+		Self::ControllerError(error)
 	}
 }
 
-impl Error for Err2048 {}
+impl Display for GameError {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		match self {
+			Self::GridIsFull => f.write_str("grid is full"),
+			GameError::ControllerError(err) => err.fmt(f),
+		}
+	}
+}
+
+impl Error for GameError {}
 
 pub struct Game {
 	board: Grid,
@@ -70,7 +77,7 @@ impl Game {
 		}
 	}
 
-	pub fn turn(&mut self) -> Result<(), Box<dyn Error>> {
+	pub fn turn(&mut self) -> Result<(), GameError> {
 		for _ in 0..self.spawn_per_turn {
 			self.spawn_random()?;
 		}
@@ -80,7 +87,7 @@ impl Game {
 		Ok(())
 	}
 
-	pub fn spawn_random(&mut self) -> Result<(), Box<dyn Error>> {
+	pub fn spawn_random(&mut self) -> Result<(), GameError> {
 		let mut potentials = vec![];
 		for x in 0..self.board.size() {
 			for y in 0..self.board.size() {
@@ -91,7 +98,7 @@ impl Game {
 		}
 		let potential_count = potentials.len() as f32;
 		if potential_count == 0. {
-			return Err(Err2048::GridIsFull.into());
+			return Err(GameError::GridIsFull.into());
 		}
 		let random = rand::random::<f32>() * potential_count;
 		let index = random.floor() as usize;
