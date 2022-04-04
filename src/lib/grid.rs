@@ -1,3 +1,12 @@
+use std::{
+	collections::hash_map::DefaultHasher,
+	fmt::format,
+	hash::{Hash, Hasher},
+	intrinsics::transmute,
+};
+
+use termion::color;
+
 #[derive(Clone, Copy)]
 pub struct Tile {
 	value: Option<usize>,
@@ -33,7 +42,7 @@ impl Tile {
 
 	pub fn display(&self) -> String {
 		match self.value {
-			Some(value) => Self::display_number(value),
+			Some(value) => Self::color_representation(Self::display_number(value), value),
 			None => [
 				// empty tile
 				"       ", "       ", "       ",
@@ -42,12 +51,12 @@ impl Tile {
 		}
 	}
 
-	pub fn display_number(value: usize) -> String {
+	fn display_number(value: usize) -> String {
 		let result = [
 			// number tile
-			"┌─────┐",
+			"┌─   ─┐",
 			&Self::pad_both(value.to_string(), Self::TILE_LENGTH),
-			"└─────┘",
+			"└─   ─┘",
 		]
 		.join("\n");
 		result
@@ -63,6 +72,47 @@ impl Tile {
 		} else {
 			text
 		}
+	}
+
+	fn color_representation(text: String, value: usize) -> String {
+		let color = Self::hashed_color(value);
+		let color_code = color::Bg(color);
+		let reset_code = color::Bg(color::Reset);
+
+		let text = text
+			.split("\n")
+			.map(|line| format!("{color_code}{line}{reset_code}"))
+			.collect::<Vec<_>>()
+			.join("\n");
+		text
+	}
+
+	// [  |  |  ]
+
+	fn hashed_color(value: usize) -> color::Rgb {
+		let mut hasher = DefaultHasher::new();
+		value.hash(&mut hasher);
+		let hash = hasher.finish();
+		// SAFETY:
+		// there are no logic that relies on the value of the outputted numbers, thus it is safe to create them without constructors
+		let [frac_a, frac_b]: [f64; 2] = unsafe { transmute::<_, [u32; 2]>(hash) }
+			.into_iter()
+			.map(|frac| (frac as f64) / (u32::MAX as f64))
+			.collect::<Vec<_>>()
+			.try_into()
+			.unwrap();
+
+		let mut remaining = 255f64;
+		let r = Self::take_frac(&mut remaining, frac_a) as u8;
+		let g = Self::take_frac(&mut remaining, frac_b) as u8;
+		let b = remaining as u8;
+		color::Rgb(r, g, b)
+	}
+
+	fn take_frac(remainder: &mut f64, frac: f64) -> f64 {
+		let result = *remainder * frac;
+		*remainder -= result;
+		result
 	}
 }
 
