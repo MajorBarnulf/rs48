@@ -57,6 +57,7 @@ impl Error for GameError {}
 #[derive(Clone)]
 pub struct Game {
 	board: Grid,
+	score: usize,
 	spawn_per_turn: usize,
 }
 
@@ -69,12 +70,17 @@ impl Game {
 
 		Self {
 			board: Grid::new(size),
+			score: 0,
 			spawn_per_turn,
 		}
 	}
 
 	pub fn get_board(&self) -> &Grid {
 		&self.board
+	}
+
+	pub fn get_score(&self) -> usize {
+		self.score
 	}
 
 	pub fn turn(&mut self, movement: Move) -> Result<(), GameError> {
