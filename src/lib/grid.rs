@@ -1,8 +1,7 @@
 use std::{
 	collections::hash_map::DefaultHasher,
-	fmt::format,
 	hash::{Hash, Hasher},
-	intrinsics::transmute,
+	mem::transmute_copy,
 };
 
 use termion::color;
@@ -95,22 +94,22 @@ impl Tile {
 		let hash = hasher.finish();
 		// SAFETY:
 		// there are no logic that relies on the value of the outputted numbers, thus it is safe to create them without constructors
-		let [frac_a, frac_b]: [f64; 2] = unsafe { transmute::<_, [u32; 2]>(hash) }
+		let [frac_a, frac_b]: [f64; 2] = unsafe { transmute_copy::<_, [u32; 2]>(&hash) }
 			.into_iter()
 			.map(|frac| (frac as f64) / (u32::MAX as f64))
 			.collect::<Vec<_>>()
 			.try_into()
 			.unwrap();
 
-		let mut remaining = 255f64;
-		let r = Self::take_frac(&mut remaining, frac_a) as u8;
-		let g = Self::take_frac(&mut remaining, frac_b) as u8;
+		let mut remaining = 300f64;
+		let r = Self::take_fraction(&mut remaining, frac_a, 200.) as u8;
+		let g = Self::take_fraction(&mut remaining, frac_b, 200.) as u8;
 		let b = remaining as u8;
 		color::Rgb(r, g, b)
 	}
 
-	fn take_frac(remainder: &mut f64, frac: f64) -> f64 {
-		let result = *remainder * frac;
+	fn take_fraction(remainder: &mut f64, frac: f64, max: f64) -> f64 {
+		let result = (*remainder * frac).min(max);
 		*remainder -= result;
 		result
 	}
