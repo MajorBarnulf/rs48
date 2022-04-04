@@ -1,4 +1,4 @@
-use std::{error::Error, fmt::Display};
+use std::{error::Error, fmt::Display, thread, time::Duration};
 
 use super::{
 	controller::{Controller, ControllerError, Move},
@@ -10,6 +10,7 @@ pub struct Rules {
 	spawn_per_turn: usize,
 	clear_term: bool,
 	color_seed: u16,
+	pause: Duration,
 }
 
 impl Rules {
@@ -27,6 +28,16 @@ impl Rules {
 		self.clear_term = clear_term;
 		self
 	}
+
+	pub fn color_seed(mut self, color_seed: u16) -> Self {
+		self.color_seed = color_seed;
+		self
+	}
+
+	pub fn pause(mut self, pause: Duration) -> Self {
+		self.pause = pause;
+		self
+	}
 }
 
 impl Default for Rules {
@@ -36,6 +47,7 @@ impl Default for Rules {
 			spawn_per_turn: 1,
 			clear_term: true,
 			color_seed: 35,
+			pause: Duration::ZERO,
 		}
 	}
 }
@@ -68,6 +80,7 @@ pub struct Game {
 	board: Grid,
 	spawn_per_turn: usize,
 	clear_term: bool,
+	pause: Duration,
 }
 
 impl Game {
@@ -77,12 +90,14 @@ impl Game {
 			spawn_per_turn,
 			clear_term,
 			color_seed,
+			pause,
 		} = rules;
 
 		Self {
 			board: Grid::new(size, color_seed),
 			spawn_per_turn,
 			clear_term,
+			pause,
 		}
 	}
 
@@ -95,6 +110,7 @@ impl Game {
 		for _ in 0..self.spawn_per_turn {
 			self.spawn_random()?;
 		}
+		thread::sleep(self.pause);
 		Ok(())
 	}
 
