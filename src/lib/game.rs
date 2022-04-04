@@ -170,7 +170,12 @@ impl<'g> Displacement<'g> {
     }
 
     pub fn move_all(&mut self) {
-        while self.move_once() {}
+        loop {
+            let can_continue = self.move_once();
+            if !can_continue {
+                break;
+            }
+        }
     }
 
     fn move_once(&mut self) -> bool {
