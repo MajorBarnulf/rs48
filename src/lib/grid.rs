@@ -94,4 +94,20 @@ impl Grid {
 		self.tiles[dst_y][dst_x] = src;
 		self.tiles[src_y][src_x] = Tile::new_empty();
 	}
+
+	///
+	/// get the biggest value of the board
+	///
+	pub fn biggest_value(&self) -> usize {
+		self.tiles()
+			.iter()
+			.map(|row| {
+				row.iter()
+					.filter_map(|tile| tile.value())
+					.reduce(|a, b| a.max(b))
+			})
+			.filter_map(|value| value)
+			.reduce(|a, b| a.max(b))
+			.unwrap_or(0)
+	}
 }

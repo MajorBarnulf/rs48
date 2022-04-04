@@ -5,7 +5,7 @@ use crate::lib::{
 	game::{self, Game, GameError},
 };
 
-use super::grid_displayer::GridDisplayer;
+use super::{clear_term, grid_displayer::GridDisplayer};
 
 pub struct Rules {
 	display: bool,
@@ -83,27 +83,46 @@ impl GameManager {
 	}
 
 	pub fn turn(&mut self) -> Result<(), GameError> {
+		self.display_conditionnally();
+		self.game_turn()?;
+		thread::sleep(self.turn_duration);
+		Ok(())
+	}
+
+	fn display_conditionnally(&mut self) {
 		if self.display {
 			if self.display_to_skip == 0 {
-				self.refresh_display();
+				if self.clear_term {
+					clear_term();
+				}
+				self.print_display();
 				self.display_to_skip = self.display_skips;
 			} else {
 				self.display_to_skip -= 1;
 			}
 		}
-		let movement = self.controller.next_move(self.game.get_board())?;
+	}
+
+	fn game_turn(&mut self) -> Result<(), GameError> {
+		let board = self.game.get_board();
+		let movement = self.controller.next_move(board)?;
 		self.game.turn(movement)?;
-		thread::sleep(self.turn_duration);
 		Ok(())
 	}
 
-	pub fn refresh_display(&self) {
-		if self.clear_term {
-			super::clear_term();
-		}
+	pub fn print_display(&self) {
+		let headline_display = self.get_headline_display();
+		println!("{headline_display}");
 		let grid = self.game.get_board();
-		let text = self.grid_displayer.display(grid);
-		println!("{text}");
+		let grid_display = self.grid_displayer.display(grid);
+		println!("{grid_display}");
+	}
+
+	fn get_headline_display(&self) -> String {
+		let score = self.game.get_score();
+		let turn = self.game.get_turn_index();
+		let biggest_tile = self.game.get_board().biggest_value();
+		format!("score: {score:>12} | biggest tile: {biggest_tile:>12} | turn: {turn:>12}")
 	}
 
 	pub fn play_all(&mut self) -> Result<(), GameError> {

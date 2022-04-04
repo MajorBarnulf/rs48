@@ -58,6 +58,7 @@ impl Error for GameError {}
 pub struct Game {
 	board: Grid,
 	score: usize,
+	turn_index: usize,
 	spawn_per_turn: usize,
 }
 
@@ -71,6 +72,7 @@ impl Game {
 		Self {
 			board: Grid::new(size),
 			score: 0,
+			turn_index: 0,
 			spawn_per_turn,
 		}
 	}
@@ -83,11 +85,16 @@ impl Game {
 		self.score
 	}
 
+	pub fn get_turn_index(&self) -> usize {
+		self.turn_index
+	}
+
 	pub fn turn(&mut self, movement: Move) -> Result<(), GameError> {
 		self.perform_move(movement);
 		for _ in 0..self.spawn_per_turn {
 			self.spawn_random()?;
 		}
+		self.turn_index += 1;
 		Ok(())
 	}
 
