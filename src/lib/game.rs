@@ -218,7 +218,7 @@ impl<'g> Displacement<'g> {
 	}
 }
 
-/// determine if the given number, added a delta that is either 1 or -1 to it would overflow a certain maximum value for n
+/// determine if the given number, added a delta that is either 1 or -1 to it, would overflow a certain maximum value for n
 fn would_overflow(number: usize, delta: isize, max: usize) -> bool {
 	let too_little = number == 0 && delta == -1;
 	let too_big = number == max && delta == 1;
