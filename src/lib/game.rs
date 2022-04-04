@@ -90,7 +90,8 @@ impl Game {
 	}
 
 	pub fn turn(&mut self, movement: Move) -> Result<(), GameError> {
-		self.perform_move(movement);
+		let move_score = self.perform_move(movement);
+		self.score += move_score;
 		for _ in 0..self.spawn_per_turn {
 			self.spawn_random()?;
 		}
@@ -119,50 +120,53 @@ impl Game {
 	}
 
 	// TODO: macro peut être ?
-	pub fn perform_move(&mut self, movement: Move) {
+	pub fn perform_move(&mut self, movement: Move) -> usize {
+		let mut move_score = 0;
 		match movement {
 			Move::LEFT => {
 				for y in 0..self.board.size() {
 					for x in 0..self.board.size() {
-						if !self.board.get((x, y)).unwrap().is_empty() {
-							self.perform_linear_move((-1, 0), (x, y));
-						}
+						move_score += self.perform_linear_move((-1, 0), (x, y));
 					}
 				}
 			}
 			Move::RIGHT => {
 				for y in 0..self.board.size() {
 					for x in (0..self.board.size()).rev() {
-						if !self.board.get((x, y)).unwrap().is_empty() {
-							self.perform_linear_move((1, 0), (x, y));
-						}
+						move_score += self.perform_linear_move((1, 0), (x, y));
 					}
 				}
 			}
 			Move::UP => {
 				for x in 0..self.board.size() {
 					for y in 0..self.board.size() {
-						if !self.board.get((x, y)).unwrap().is_empty() {
-							self.perform_linear_move((0, -1), (x, y));
-						}
+						move_score += self.perform_linear_move((0, -1), (x, y));
 					}
 				}
 			}
 			Move::DOWN => {
 				for x in 0..self.board.size() {
 					for y in (0..self.board.size()).rev() {
-						if !self.board.get((x, y)).unwrap().is_empty() {
-							self.perform_linear_move((0, 1), (x, y));
-						}
+						move_score += self.perform_linear_move((0, 1), (x, y));
 					}
 				}
 			}
 		};
+		move_score
 	}
 
-	fn perform_linear_move(&mut self, direction: (isize, isize), tile_pos: (usize, usize)) {
-		let mut displacement = Displacement::new(&mut self.board, tile_pos, direction);
-		displacement.move_all();
+	fn perform_linear_move(
+		&mut self,
+		direction: (isize, isize),
+		tile_pos: (usize, usize),
+	) -> usize {
+		if self.board.get(tile_pos.clone()).unwrap().is_empty() {
+			0
+		} else {
+			let mut displacement = Displacement::new(&mut self.board, tile_pos, direction);
+			displacement.move_all();
+			displacement.pop_score()
+		}
 	}
 }
 
@@ -170,6 +174,7 @@ pub struct Displacement<'g> {
 	grid: &'g mut Grid,
 	position: (usize, usize),
 	direction: (isize, isize),
+	score: usize,
 }
 
 impl<'g> Displacement<'g> {
@@ -178,7 +183,13 @@ impl<'g> Displacement<'g> {
 			grid,
 			position,
 			direction,
+			score: 0,
 		}
+	}
+
+	pub fn pop_score(self) -> usize {
+		let Displacement { score, .. } = self;
+		score
 	}
 
 	pub fn move_all(&mut self) {
@@ -203,6 +214,7 @@ impl<'g> Displacement<'g> {
 				Some(value) if value == current_value => {
 					self.grid.move_tile(current_pos, next_pos);
 					self.grid.set(next_pos, Some(value * 2));
+					self.score = value * 2;
 					false
 				}
 				Some(_) => false,
