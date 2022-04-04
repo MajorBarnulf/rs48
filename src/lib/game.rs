@@ -1,7 +1,7 @@
 use std::{error::Error, fmt::Display};
 
 use super::{
-	controller::{Controller, ControllerError, Move, PlayerController},
+	controller::{player::PlayerController, Controller, ControllerError, Move},
 	grid::Grid,
 };
 
