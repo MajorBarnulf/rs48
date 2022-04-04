@@ -9,6 +9,7 @@ pub struct Rules {
 	size: usize,
 	spawn_per_turn: usize,
 	controller: Box<dyn Controller>,
+	clear_term: bool,
 }
 
 impl Rules {
@@ -21,6 +22,11 @@ impl Rules {
 		self.spawn_per_turn = spawn_per_turn;
 		self
 	}
+
+	pub fn clear_term(mut self, clear_term: bool) -> Self {
+		self.clear_term = clear_term;
+		self
+	}
 }
 
 impl Default for Rules {
@@ -29,6 +35,7 @@ impl Default for Rules {
 			size: 4,
 			spawn_per_turn: 1,
 			controller: Box::new(PlayerController::new()),
+			clear_term: true,
 		}
 	}
 }
@@ -60,6 +67,7 @@ pub struct Game {
 	board: Grid,
 	controller: Box<dyn Controller>,
 	spawn_per_turn: usize,
+	clear_term: bool,
 }
 
 impl Game {
@@ -68,12 +76,14 @@ impl Game {
 			controller,
 			size,
 			spawn_per_turn,
+			clear_term,
 		} = rules;
 
 		Self {
 			board: Grid::new(size),
 			controller,
 			spawn_per_turn,
+			clear_term,
 		}
 	}
 
@@ -108,7 +118,9 @@ impl Game {
 	}
 
 	pub fn refresh_display(&self) {
-		super::clear_term();
+		if self.clear_term {
+			super::clear_term();
+		}
 		let text = self.board.display();
 		println!("{text}");
 	}
