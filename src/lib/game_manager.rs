@@ -16,16 +16,31 @@ pub struct Rules {
 }
 
 impl Rules {
+	/// wether to display the game at all or not
+	pub fn display(mut self, display: bool) -> Self {
+		self.display = display;
+		self
+	}
+
+	/// turns to skip the display of
+	pub fn display_skips(mut self, display_skips: usize) -> Self {
+		self.display_skips = display_skips;
+		self
+	}
+
+	/// wether to clear the terminal or not between displays
 	pub fn clear_term(mut self, clear_term: bool) -> Self {
 		self.clear_term = clear_term;
 		self
 	}
 
+	/// seed for the procedural coloration of tiles
 	pub fn color_seed(mut self, color_seed: u16) -> Self {
 		self.color_seed = color_seed;
 		self
 	}
 
+	/// duration of pauses between turns
 	pub fn turn_duration(mut self, turn_duration: Duration) -> Self {
 		self.turn_duration = turn_duration;
 		self
