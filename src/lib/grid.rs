@@ -39,9 +39,11 @@ impl Tile {
 	const TILE_LENGTH: usize = 7;
 	const TILE_HEIGHT: usize = 3;
 
-	pub fn display(&self) -> String {
+	pub fn display(&self, color_seed: u16) -> String {
 		match self.value {
-			Some(value) => Self::color_representation(Self::display_number(value), value),
+			Some(value) => {
+				Self::color_representation(Self::display_number(value), value, color_seed)
+			}
 			None => [
 				// empty tile
 				"       ", "       ", "       ",
@@ -73,8 +75,8 @@ impl Tile {
 		}
 	}
 
-	fn color_representation(text: String, value: usize) -> String {
-		let color = Self::hashed_color(value);
+	fn color_representation(text: String, value: usize, color_seed: u16) -> String {
+		let color = Self::hashed_color(value, color_seed);
 		let color_code = color::Bg(color);
 		let reset_code = color::Bg(color::Reset);
 
@@ -88,9 +90,9 @@ impl Tile {
 
 	// [  |  |  ]
 
-	fn hashed_color(value: usize) -> color::Rgb {
+	fn hashed_color(value: usize, color_seed: u16) -> color::Rgb {
 		let mut hasher = DefaultHasher::new();
-		value.hash(&mut hasher);
+		(value + color_seed as usize).hash(&mut hasher);
 		let hash = hasher.finish();
 		// SAFETY:
 		// there are no logic that relies on the value of the outputted numbers, thus it is safe to create them without constructors
@@ -101,9 +103,9 @@ impl Tile {
 			.try_into()
 			.unwrap();
 
-		let mut remaining = 300f64;
-		let r = Self::take_fraction(&mut remaining, frac_a, 200.) as u8;
-		let g = Self::take_fraction(&mut remaining, frac_b, 200.) as u8;
+		let mut remaining = 255f64;
+		let r = Self::take_fraction(&mut remaining, frac_a, 150.) as u8;
+		let g = Self::take_fraction(&mut remaining, frac_b, 150.) as u8;
 		let b = remaining as u8;
 		color::Rgb(r, g, b)
 	}
@@ -119,17 +121,22 @@ impl Tile {
 pub struct Grid {
 	size: usize,
 	tiles: Vec<Vec<Tile>>,
+	color_seed: u16,
 }
 
 impl Grid {
 	///
 	/// constructor
 	///
-	pub fn new(size: usize) -> Self {
+	pub fn new(size: usize, color_seed: u16) -> Self {
 		let tiles = (0..size)
 			.map(|_| (0..size).map(|_| Tile::new_empty()).collect())
 			.collect();
-		Self { size, tiles }
+		Self {
+			size,
+			tiles,
+			color_seed,
+		}
 	}
 
 	///
@@ -195,7 +202,11 @@ impl Grid {
 		let tiles: Vec<Vec<_>> = self
 			.tiles
 			.iter()
-			.map(|row| row.iter().map(|tile| tile.display()).collect())
+			.map(|row| {
+				row.iter()
+					.map(|tile| tile.display(self.color_seed))
+					.collect()
+			})
 			.collect();
 		let row_representations: Vec<_> = tiles
 			.iter()

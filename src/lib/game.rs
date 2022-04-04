@@ -10,6 +10,7 @@ pub struct Rules {
 	spawn_per_turn: usize,
 	controller: Box<dyn Controller>,
 	clear_term: bool,
+	color_seed: u16,
 }
 
 impl Rules {
@@ -36,6 +37,7 @@ impl Default for Rules {
 			spawn_per_turn: 1,
 			controller: Box::new(PlayerController::new()),
 			clear_term: true,
+			color_seed: 35,
 		}
 	}
 }
@@ -77,10 +79,11 @@ impl Game {
 			size,
 			spawn_per_turn,
 			clear_term,
+			color_seed,
 		} = rules;
 
 		Self {
-			board: Grid::new(size),
+			board: Grid::new(size, color_seed),
 			controller,
 			spawn_per_turn,
 			clear_term,
