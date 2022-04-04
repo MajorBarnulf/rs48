@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 rand = "0.8.5"
 termion = "1.5.6"
+clap = { version = "3.1.8", features = ["derive"] }
