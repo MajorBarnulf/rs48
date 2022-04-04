@@ -1,9 +1,10 @@
 [package]
 name = "rs48"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "A game of 2048 that plays in the terminal as a TUI with a lot of configurability."
+license = "GPL-3.0"
+authors = ["JOLIMAITRE Matthieu <matthieu@imagevo.fr>"]
 
 [dependencies]
 rand = "0.8.5"
