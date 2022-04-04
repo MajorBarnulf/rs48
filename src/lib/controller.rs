@@ -52,3 +52,7 @@ pub trait Controller {
 pub mod player;
 pub mod random;
 pub mod simulated;
+
+pub use player::PlayerController;
+pub use random::RandomController;
+pub use simulated::SimulatedController;
