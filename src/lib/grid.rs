@@ -1,26 +1,3 @@
-/// 0: '┘'
-///
-/// 1: '┐'
-///
-/// 2: '┌'
-///
-/// 3: '└'
-///
-/// 4: '┼'
-///
-/// 5: '─'
-///
-/// 6: '├'
-///
-/// 7: '┤'
-///
-/// 8: '┴'
-///
-/// 9: '┬'
-///
-/// 10: '│'
-const DISPLAY_CHAR: [&'static str; 11] = ["┘", "┐", "┌", "└", "┼", "─", "├", "┤", "┴", "┬", "│"];
-
 #[derive(Clone, Copy)]
 pub struct Tile {
     value: Option<usize>,
@@ -45,7 +22,12 @@ impl Tile {
             true
         }
     }
+}
 
+///
+/// displayability
+///
+impl Tile {
     const TILE_LENGTH: usize = 7;
     const TILE_HEIGHT: usize = 3;
 
@@ -91,6 +73,9 @@ pub struct Grid {
 }
 
 impl Grid {
+    ///
+    /// constructor
+    ///
     pub fn new(size: usize) -> Self {
         let tiles = (0..size)
             .map(|_| (0..size).map(|_| Tile::new_empty()).collect())
@@ -98,6 +83,9 @@ impl Grid {
         Self { size, tiles }
     }
 
+    ///
+    /// set the value of the tile at the selected position
+    ///
     pub fn set(&mut self, (x, y): (usize, usize), value: Option<usize>) {
         self.tiles[y][x] = if let Some(value) = value {
             Tile::new_with_value(value)
@@ -106,6 +94,9 @@ impl Grid {
         };
     }
 
+    ///
+    /// get a tile if the position is in the grid
+    ///
     pub fn get(&self, (x, y): (usize, usize)) -> Option<&Tile> {
         match self.tiles.get(y).map(|row| row.get(x)) {
             Some(Some(tile)) => Some(tile),
@@ -113,6 +104,9 @@ impl Grid {
         }
     }
 
+    ///
+    /// get the value of a tile if the position is in the grid and the tile has a value
+    ///
     pub fn get_val(&self, (x, y): (usize, usize)) -> Option<usize> {
         match self.get((x, y)).map(|tile| tile.value()) {
             Some(Some(value)) => Some(value),
@@ -120,33 +114,68 @@ impl Grid {
         }
     }
 
-    pub fn get_mut(&mut self, x: usize, y: usize) -> &Tile {
-        &mut self.tiles[y][x]
-    }
-
+    ///
+    /// get the size of the grid
+    ///
     pub fn size(&self) -> usize {
         self.size
     }
 
+    ///
+    /// move a tile over another one, replace the previously occupied place by an empty tile and overrides the destination
+    ///
     pub fn move_tile(&mut self, (src_x, src_y): (usize, usize), (dst_x, dst_y): (usize, usize)) {
         let src = self.tiles[src_y][src_x].clone();
         self.tiles[dst_y][dst_x] = src;
         self.tiles[src_y][src_x] = Tile::new_empty();
     }
+}
 
+///
+/// displayability
+///
+impl Grid {
+    /// 0: '┘'
+    ///
+    /// 1: '┐'
+    ///
+    /// 2: '┌'
+    ///
+    /// 3: '└'
+    ///
+    /// 4: '┼'
+    ///
+    /// 5: '─'
+    ///
+    /// 6: '├'
+    ///
+    /// 7: '┤'
+    ///
+    /// 8: '┴'
+    ///
+    /// 9: '┬'
+    ///
+    /// 10: '│'
+    const DISPLAY_CHAR: [&'static str; 11] =
+        ["┘", "┐", "┌", "└", "┼", "─", "├", "┤", "┴", "┬", "│"];
+
+    ///
+    /// returns a string of multiple lines representing the grid
+    ///
     pub fn display(&self) -> String {
         let tiles: Vec<Vec<_>> = self
             .tiles
             .iter()
             .map(|row| row.iter().map(|tile| tile.display()).collect())
             .collect();
-        let row_displays: Vec<_> = tiles
+        let row_representations: Vec<_> = tiles
             .iter()
-            .map(|row| {
+            .map(|row_representation| {
                 let mut row_lines = (0..Tile::TILE_HEIGHT).map(|_| vec![]).collect::<Vec<_>>();
                 // push every item lines in [`row_lines`]
-                for item in row {
-                    item.split('\n')
+                for item_representation in row_representation {
+                    item_representation
+                        .split('\n')
                         .into_iter()
                         .zip(row_lines.iter_mut())
                         .for_each(|(item_line, row_line)| row_line.push(item_line.to_string()));
@@ -154,8 +183,8 @@ impl Grid {
                 // join lines of [`row_lines`]
                 let row_lines = row_lines
                     .iter_mut()
-                    .map(|line_parts| line_parts.join(DISPLAY_CHAR[10]).to_string())
-                    .map(|line| [DISPLAY_CHAR[10], &line, DISPLAY_CHAR[10]].join(""))
+                    .map(|line_parts| line_parts.join(Self::DISPLAY_CHAR[10]).to_string())
+                    .map(|line| [Self::DISPLAY_CHAR[10], &line, Self::DISPLAY_CHAR[10]].join(""))
                     .collect::<Vec<_>>();
                 row_lines.join("\n")
             })
@@ -163,7 +192,7 @@ impl Grid {
 
         [
             self.first_grid_display_line(),
-            row_displays.join(&self.between_grid_display_line()),
+            row_representations.join(&self.between_grid_display_line()),
             self.last_grid_display_line(),
         ]
         .join("\n")
@@ -171,25 +200,32 @@ impl Grid {
 
     fn first_grid_display_line(&self) -> String {
         let middle = (0..self.size)
-            .map(|_| DISPLAY_CHAR[5].repeat(Tile::TILE_LENGTH))
+            .map(|_| Self::DISPLAY_CHAR[5].repeat(Tile::TILE_LENGTH))
             .collect::<Vec<_>>()
-            .join(DISPLAY_CHAR[9]);
-        [DISPLAY_CHAR[2], &middle, DISPLAY_CHAR[1]].join("")
+            .join(Self::DISPLAY_CHAR[9]);
+        [Self::DISPLAY_CHAR[2], &middle, Self::DISPLAY_CHAR[1]].join("")
     }
 
     fn between_grid_display_line(&self) -> String {
         let middle = (0..self.size)
-            .map(|_| DISPLAY_CHAR[5].repeat(Tile::TILE_LENGTH))
+            .map(|_| Self::DISPLAY_CHAR[5].repeat(Tile::TILE_LENGTH))
             .collect::<Vec<_>>()
-            .join(DISPLAY_CHAR[4]);
-        ["\n", DISPLAY_CHAR[6], &middle, DISPLAY_CHAR[7], "\n"].join("")
+            .join(Self::DISPLAY_CHAR[4]);
+        [
+            "\n",
+            Self::DISPLAY_CHAR[6],
+            &middle,
+            Self::DISPLAY_CHAR[7],
+            "\n",
+        ]
+        .join("")
     }
 
     fn last_grid_display_line(&self) -> String {
         let middle = (0..self.size)
-            .map(|_| DISPLAY_CHAR[5].repeat(Tile::TILE_LENGTH))
+            .map(|_| Self::DISPLAY_CHAR[5].repeat(Tile::TILE_LENGTH))
             .collect::<Vec<_>>()
-            .join(DISPLAY_CHAR[8]);
-        [DISPLAY_CHAR[3], &middle, DISPLAY_CHAR[0], "\n"].join("")
+            .join(Self::DISPLAY_CHAR[8]);
+        [Self::DISPLAY_CHAR[3], &middle, Self::DISPLAY_CHAR[0], "\n"].join("")
     }
 }
