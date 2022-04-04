@@ -1,14 +1,13 @@
 use std::{error::Error, fmt::Display};
 
 use super::{
-	controller::{player::PlayerController, Controller, ControllerError, Move},
+	controller::{Controller, ControllerError, Move},
 	grid::Grid,
 };
 
 pub struct Rules {
 	size: usize,
 	spawn_per_turn: usize,
-	controller: Box<dyn Controller>,
 	clear_term: bool,
 	color_seed: u16,
 }
@@ -35,7 +34,6 @@ impl Default for Rules {
 		Self {
 			size: 4,
 			spawn_per_turn: 1,
-			controller: Box::new(PlayerController::new()),
 			clear_term: true,
 			color_seed: 35,
 		}
@@ -65,9 +63,9 @@ impl Display for GameError {
 
 impl Error for GameError {}
 
+#[derive(Clone)]
 pub struct Game {
 	board: Grid,
-	controller: Box<dyn Controller>,
 	spawn_per_turn: usize,
 	clear_term: bool,
 }
@@ -75,7 +73,6 @@ pub struct Game {
 impl Game {
 	pub fn new(rules: Rules) -> Self {
 		let Rules {
-			controller,
 			size,
 			spawn_per_turn,
 			clear_term,
@@ -84,19 +81,20 @@ impl Game {
 
 		Self {
 			board: Grid::new(size, color_seed),
-			controller,
 			spawn_per_turn,
 			clear_term,
 		}
 	}
 
-	pub fn turn(&mut self) -> Result<(), GameError> {
+	pub fn controlled(self, controller: Box<dyn Controller>) -> ControlledGame {
+		ControlledGame::new(self, controller, true)
+	}
+
+	pub fn turn(&mut self, movement: Move) -> Result<(), GameError> {
+		self.perform_move(movement);
 		for _ in 0..self.spawn_per_turn {
 			self.spawn_random()?;
 		}
-		self.refresh_display();
-		let movement = self.controller.next_move(&self.board)?;
-		self.perform_move(movement);
 		Ok(())
 	}
 
@@ -246,4 +244,29 @@ fn would_overflow(number: usize, delta: isize, max: usize) -> bool {
 	let too_little = number == 0 && delta == -1;
 	let too_big = number == max && delta == 1;
 	too_little || too_big
+}
+
+pub struct ControlledGame {
+	game: Game,
+	controller: Box<dyn Controller>,
+	display: bool,
+}
+
+impl ControlledGame {
+	pub fn new(game: Game, controller: Box<dyn Controller>, display: bool) -> Self {
+		Self {
+			game,
+			controller,
+			display,
+		}
+	}
+
+	pub fn turn(&mut self) -> Result<(), GameError> {
+		if self.display {
+			self.game.refresh_display();
+		}
+		let movement = self.controller.next_move(&self.game.board)?;
+		self.game.turn(movement)?;
+		Ok(())
+	}
 }

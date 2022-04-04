@@ -26,6 +26,13 @@ impl Error for ControllerError {}
 
 pub trait Controller {
 	fn next_move(&mut self, grid: &Grid) -> Result<Move, ControllerError>;
+
+	fn into_box(self) -> Box<dyn Controller>
+	where
+		Self: Sized + 'static,
+	{
+		Box::new(self)
+	}
 }
 
 pub mod player;
