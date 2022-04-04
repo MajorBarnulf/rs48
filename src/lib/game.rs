@@ -1,16 +1,13 @@
-use std::{error::Error, fmt::Display, thread, time::Duration};
+use std::{error::Error, fmt::Display};
 
 use super::{
-	controller::{Controller, ControllerError, Move},
+	controller::{ControllerError, Move},
 	grid::Grid,
 };
 
 pub struct Rules {
 	size: usize,
 	spawn_per_turn: usize,
-	clear_term: bool,
-	color_seed: u16,
-	pause: Duration,
 }
 
 impl Rules {
@@ -23,21 +20,6 @@ impl Rules {
 		self.spawn_per_turn = spawn_per_turn;
 		self
 	}
-
-	pub fn clear_term(mut self, clear_term: bool) -> Self {
-		self.clear_term = clear_term;
-		self
-	}
-
-	pub fn color_seed(mut self, color_seed: u16) -> Self {
-		self.color_seed = color_seed;
-		self
-	}
-
-	pub fn pause(mut self, pause: Duration) -> Self {
-		self.pause = pause;
-		self
-	}
 }
 
 impl Default for Rules {
@@ -45,9 +27,6 @@ impl Default for Rules {
 		Self {
 			size: 4,
 			spawn_per_turn: 1,
-			clear_term: true,
-			color_seed: 35,
-			pause: Duration::ZERO,
 		}
 	}
 }
@@ -79,8 +58,6 @@ impl Error for GameError {}
 pub struct Game {
 	board: Grid,
 	spawn_per_turn: usize,
-	clear_term: bool,
-	pause: Duration,
 }
 
 impl Game {
@@ -88,21 +65,16 @@ impl Game {
 		let Rules {
 			size,
 			spawn_per_turn,
-			clear_term,
-			color_seed,
-			pause,
 		} = rules;
 
 		Self {
-			board: Grid::new(size, color_seed),
+			board: Grid::new(size),
 			spawn_per_turn,
-			clear_term,
-			pause,
 		}
 	}
 
-	pub fn controlled(self, controller: Box<dyn Controller>) -> ControlledGame {
-		ControlledGame::new(self, controller, true)
+	pub fn get_board(&self) -> &Grid {
+		&self.board
 	}
 
 	pub fn turn(&mut self, movement: Move) -> Result<(), GameError> {
@@ -110,11 +82,10 @@ impl Game {
 		for _ in 0..self.spawn_per_turn {
 			self.spawn_random()?;
 		}
-		thread::sleep(self.pause);
 		Ok(())
 	}
 
-	pub fn spawn_random(&mut self) -> Result<(), GameError> {
+	fn spawn_random(&mut self) -> Result<(), GameError> {
 		let mut potentials = vec![];
 		for x in 0..self.board.size() {
 			for y in 0..self.board.size() {
@@ -132,14 +103,6 @@ impl Game {
 		let (x, y) = potentials[index];
 		self.board.set((x, y), Some(1));
 		Ok(())
-	}
-
-	pub fn refresh_display(&self) {
-		if self.clear_term {
-			super::clear_term();
-		}
-		let text = self.board.display();
-		println!("{text}");
 	}
 
 	// TODO: macro peut être ?
@@ -260,29 +223,4 @@ fn would_overflow(number: usize, delta: isize, max: usize) -> bool {
 	let too_little = number == 0 && delta == -1;
 	let too_big = number == max && delta == 1;
 	too_little || too_big
-}
-
-pub struct ControlledGame {
-	game: Game,
-	controller: Box<dyn Controller>,
-	display: bool,
-}
-
-impl ControlledGame {
-	pub fn new(game: Game, controller: Box<dyn Controller>, display: bool) -> Self {
-		Self {
-			game,
-			controller,
-			display,
-		}
-	}
-
-	pub fn turn(&mut self) -> Result<(), GameError> {
-		if self.display {
-			self.game.refresh_display();
-		}
-		let movement = self.controller.next_move(&self.game.board)?;
-		self.game.turn(movement)?;
-		Ok(())
-	}
 }

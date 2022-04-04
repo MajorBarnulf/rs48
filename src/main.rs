@@ -1,18 +1,15 @@
 use lib::{
-	controller::{player::PlayerController, Controller},
-	game::{Game, Rules},
+	controller::{player::PlayerController, random::RandomController, Controller},
+	game::{self, GameError},
+	game_manager::{self, GameManager},
 };
 
 pub mod lib;
 
-fn main() {
-	let rules = Rules::default()
-		.size(4)
-		.spawn_per_turn(1)
-		.clear_term(false);
+fn main() -> Result<(), GameError> {
+	let game_rules = game::Rules::default().size(8).spawn_per_turn(1);
+	let manager_rules = game_manager::Rules::default();
 	let controller = PlayerController::new().into_box();
-	let mut game = Game::new(rules).controlled(controller);
-	loop {
-		game.turn().unwrap();
-	}
+	let mut managed = GameManager::new(game_rules, manager_rules, controller);
+	managed.play_all()
 }
