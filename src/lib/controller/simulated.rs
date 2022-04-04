@@ -8,27 +8,27 @@ pub enum Objective {
 }
 
 pub struct SimulatedController {
-	simulations_per_move: usize,
-	length_of_simulation: usize,
-	objective: Objective,
+	_simulations_per_move: usize,
+	_length_of_simulation: usize,
+	_objective: Objective,
 }
 
 impl SimulatedController {
 	pub fn new(
-		simulations_per_move: usize,
-		length_of_simulation: usize,
-		objective: Objective,
+		_simulations_per_move: usize,
+		_length_of_simulation: usize,
+		_objective: Objective,
 	) -> Self {
 		Self {
-			simulations_per_move,
-			length_of_simulation,
-			objective,
+			_simulations_per_move,
+			_length_of_simulation,
+			_objective,
 		}
 	}
 }
 
 impl Controller for SimulatedController {
-	fn next_move(&mut self, grid: &Grid) -> Result<Move, ControllerError> {
+	fn next_move(&mut self, _grid: &Grid) -> Result<Move, ControllerError> {
 		todo!()
 	}
 }
