@@ -1,0 +1,11 @@
+[package]
+name = "rs48_lib"
+version = "1.0.0"
+edition = "2021"
+description = "components of rs48"
+license = "MIT"
+authors = ["JOLIMAITRE Matthieu <matthieu@imagevo.fr>"]
+
+[dependencies]
+rand = "0.8"
+termion = "1.5"
