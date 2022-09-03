@@ -10,3 +10,4 @@ authors = ["JOLIMAITRE Matthieu <matthieu@imagevo.fr>"]
 rand = "0.8.5"
 termion = "1.5.6"
 clap = { version = "3.1.8", features = ["derive"] }
+rs48_lib = { path = "../rs48_lib" }

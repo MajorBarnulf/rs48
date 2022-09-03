@@ -1,4 +1,4 @@
-use crate::lib::grid::Grid;
+use crate::grid::Grid;
 
 use super::{Controller, ControllerError, Move};
 

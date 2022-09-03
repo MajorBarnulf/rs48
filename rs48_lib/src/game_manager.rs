@@ -1,6 +1,6 @@
 use std::{thread, time::Duration};
 
-use crate::lib::{
+use crate::{
 	controller::Controller,
 	game::{self, Game, GameError},
 };

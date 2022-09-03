@@ -1,7 +1,7 @@
 use rand::random;
 
 use super::{Controller, ControllerError, Move};
-use crate::lib::grid::Grid;
+use crate::grid::Grid;
 
 pub struct RandomController;
 

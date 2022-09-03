@@ -2,7 +2,7 @@ use std::io::{stdin, stdout};
 use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
 use super::{Controller, ControllerError, Move};
-use crate::lib::grid::Grid;
+use crate::grid::Grid;
 
 pub struct PlayerController;
 

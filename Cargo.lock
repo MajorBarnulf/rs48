@@ -238,6 +238,15 @@ version = "1.0.0"
 dependencies = [
  "clap",
  "rand",
+ "rs48_lib",
+ "termion",
+]
+
+[[package]]
+name = "rs48_lib"
+version = "1.0.0"
+dependencies = [
+ "rand",
  "termion",
 ]
 

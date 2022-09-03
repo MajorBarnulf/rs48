@@ -1,9 +1,7 @@
-pub mod lib;
-
 use std::{fmt::Display, str::FromStr, time::Duration};
 
 use clap::{ArgEnum, Parser};
-use lib::prelude::*;
+use rs48_lib::prelude::*;
 
 #[derive(Clone, ArgEnum, Debug)]
 pub enum ControllerParam {
