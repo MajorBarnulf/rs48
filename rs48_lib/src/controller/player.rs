@@ -15,9 +15,11 @@ impl PlayerController {
 impl Controller for PlayerController {
 	fn next_move(&mut self, _grid: &Grid) -> Result<Move, ControllerError> {
 		let stdin = stdin();
-		let mut _stdout = stdout().into_raw_mode().unwrap();
+		let mut _stdout = stdout()
+			.into_raw_mode()
+			.expect("terminal needs to be set into raw mode");
 		for c in stdin.keys() {
-			let movement = match c.unwrap() {
+			let movement = match c.expect("key should be readable") {
 				Key::Char('q') => return Err(ControllerError::ExitSignal),
 				Key::Left => Move::LEFT,
 				Key::Right => Move::RIGHT,

@@ -79,7 +79,7 @@ impl TileDisplayer {
 			.map(|frac| (frac as f64) / (u32::MAX as f64))
 			.collect::<Vec<_>>()
 			.try_into()
-			.unwrap();
+			.expect("iterator is constructed from array of two values");
 
 		let mut remaining = 255f64;
 		let r = Self::take_fraction(&mut remaining, frac_a, 150.) as u8;

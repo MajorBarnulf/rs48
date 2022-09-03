@@ -103,7 +103,12 @@ impl Game {
 		let mut potentials = vec![];
 		for x in 0..self.board.size() {
 			for y in 0..self.board.size() {
-				if self.board.get((x, y)).unwrap().is_empty() {
+				if self
+					.board
+					.get((x, y))
+					.expect("coordinates are valid")
+					.is_empty()
+				{
 					potentials.push((x, y));
 				}
 			}
@@ -119,7 +124,6 @@ impl Game {
 		Ok(())
 	}
 
-	// TODO: macro peut être ?
 	pub fn perform_move(&mut self, movement: Move) -> usize {
 		let mut move_score = 0;
 		match movement {
@@ -160,7 +164,12 @@ impl Game {
 		direction: (isize, isize),
 		tile_pos: (usize, usize),
 	) -> usize {
-		if self.board.get(tile_pos).unwrap().is_empty() {
+		if self
+			.board
+			.get(tile_pos)
+			.expect("function should only be called internally with known coordinates")
+			.is_empty()
+		{
 			0
 		} else {
 			let mut displacement = Displacement::new(&mut self.board, tile_pos, direction);
@@ -203,7 +212,10 @@ impl<'g> Displacement<'g> {
 
 	fn move_once(&mut self) -> bool {
 		let current_pos = self.position;
-		let current_value = self.grid.get_val(current_pos).unwrap();
+		let current_value = self
+			.grid
+			.get_val(current_pos)
+			.expect("last position should be valid");
 		if let Some(next_pos) = self.get_next_pos() {
 			match self.grid.get_val(next_pos) {
 				None => {

@@ -64,13 +64,16 @@ pub struct Arguments {
 
 fn main() -> Result<(), GameError> {
 	let arguments = Arguments::parse();
+
 	let game_rules = GameRules::default()
 		.size(arguments.size)
 		.spawn_per_turn(arguments.spawn);
+
 	let manager_rules = ManagerRules::default()
 		.clear_term(!arguments.no_clear)
 		.display_skips(arguments.display_skips)
 		.turn_duration(Duration::from_millis(arguments.delay));
+
 	let controller = match arguments.controller {
 		ControllerParam::Player => PlayerController::new().into_box(),
 		ControllerParam::Random => RandomController::new().into_box(),
