@@ -34,14 +34,13 @@ impl TileDisplayer {
 	}
 
 	fn display_number(value: usize) -> String {
-		let result = [
+		[
 			// number tile
 			"┌─   ─┐",
 			&Self::pad_both(value.to_string(), Self::TILE_LENGTH),
 			"└─   ─┘",
 		]
-		.join("\n");
-		result
+		.join("\n")
 	}
 
 	fn pad_both(text: String, length: usize) -> String {
@@ -62,7 +61,7 @@ impl TileDisplayer {
 		let reset_code = color::Bg(color::Reset);
 
 		let text = text
-			.split("\n")
+			.split('\n')
 			.map(|line| format!("{color_code}{line}{reset_code}"))
 			.collect::<Vec<_>>()
 			.join("\n");
@@ -140,7 +139,7 @@ impl GridDisplayer {
 				// join lines of [`row_lines`]
 				let row_lines = row_lines
 					.iter_mut()
-					.map(|line_parts| line_parts.join(Self::DISPLAY_CHAR[10]).to_string())
+					.map(|line_parts| line_parts.join(Self::DISPLAY_CHAR[10]))
 					.map(|line| [Self::DISPLAY_CHAR[10], &line, Self::DISPLAY_CHAR[10]].join(""))
 					.collect::<Vec<_>>();
 				row_lines.join("\n")

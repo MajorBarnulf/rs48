@@ -12,10 +12,10 @@ pub enum ControllerParam {
 
 impl Display for ControllerParam {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		f.write_str(match self {
-			&ControllerParam::Player => "player",
-			&ControllerParam::Random => "random",
-			&ControllerParam::Simulated => "simulated",
+		f.write_str(match *self {
+			ControllerParam::Player => "player",
+			ControllerParam::Random => "random",
+			ControllerParam::Simulated => "simulated",
 		})
 	}
 }

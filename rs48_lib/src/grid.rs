@@ -12,15 +12,11 @@ impl Tile {
 	}
 
 	pub fn value(&self) -> Option<usize> {
-		self.value.clone()
+		self.value
 	}
 
 	pub fn is_empty(&self) -> bool {
-		if let Some(_) = self.value {
-			false
-		} else {
-			true
-		}
+		self.value.is_none()
 	}
 }
 
@@ -90,7 +86,7 @@ impl Grid {
 	/// move a tile over another one, replace the previously occupied place by an empty tile and overrides the destination
 	///
 	pub fn move_tile(&mut self, (src_x, src_y): (usize, usize), (dst_x, dst_y): (usize, usize)) {
-		let src = self.tiles[src_y][src_x].clone();
+		let src = self.tiles[src_y][src_x];
 		self.tiles[dst_y][dst_x] = src;
 		self.tiles[src_y][src_x] = Tile::new_empty();
 	}
@@ -101,12 +97,11 @@ impl Grid {
 	pub fn biggest_value(&self) -> usize {
 		self.tiles()
 			.iter()
-			.map(|row| {
+			.filter_map(|row| {
 				row.iter()
 					.filter_map(|tile| tile.value())
 					.reduce(|a, b| a.max(b))
 			})
-			.filter_map(|value| value)
 			.reduce(|a, b| a.max(b))
 			.unwrap_or(0)
 	}

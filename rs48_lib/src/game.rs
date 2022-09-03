@@ -110,7 +110,7 @@ impl Game {
 		}
 		let potential_count = potentials.len() as f32;
 		if potential_count == 0. {
-			return Err(GameError::GridIsFull.into());
+			return Err(GameError::GridIsFull);
 		}
 		let random = rand::random::<f32>() * potential_count;
 		let index = random.floor() as usize;
@@ -160,7 +160,7 @@ impl Game {
 		direction: (isize, isize),
 		tile_pos: (usize, usize),
 	) -> usize {
-		if self.board.get(tile_pos.clone()).unwrap().is_empty() {
+		if self.board.get(tile_pos).unwrap().is_empty() {
 			0
 		} else {
 			let mut displacement = Displacement::new(&mut self.board, tile_pos, direction);
@@ -202,7 +202,7 @@ impl<'g> Displacement<'g> {
 	}
 
 	fn move_once(&mut self) -> bool {
-		let current_pos = self.position.clone();
+		let current_pos = self.position;
 		let current_value = self.grid.get_val(current_pos).unwrap();
 		if let Some(next_pos) = self.get_next_pos() {
 			match self.grid.get_val(next_pos) {
@@ -225,8 +225,8 @@ impl<'g> Displacement<'g> {
 	}
 
 	fn get_next_pos(&self) -> Option<(usize, usize)> {
-		let (current_x, current_y) = self.position.clone();
-		let (dx, dy) = self.direction.clone();
+		let (current_x, current_y) = self.position;
+		let (dx, dy) = self.direction;
 		if would_overflow(current_x, dx, self.grid.size() - 1)
 			|| would_overflow(current_y, dy, self.grid.size() - 1)
 		{
