@@ -8,4 +8,4 @@ authors = ["JOLIMAITRE Matthieu <matthieu@imagevo.fr>"]
 
 [dependencies]
 clap = { version = "3.1", features = ["derive"] }
-rs48_lib = { path = "../rs48_lib" }
+rs48_lib = "1.1"
