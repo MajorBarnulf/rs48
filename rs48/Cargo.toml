@@ -1,13 +1,11 @@
 [package]
 name = "rs48"
-version = "1.0.0"
+version = "1.1.0"
 edition = "2021"
 description = "A game of 2048 that plays in the terminal as a TUI with a lot of configurability."
 license = "GPL-3.0"
 authors = ["JOLIMAITRE Matthieu <matthieu@imagevo.fr>"]
 
 [dependencies]
-rand = "0.8.5"
-termion = "1.5.6"
-clap = { version = "3.1.8", features = ["derive"] }
+clap = { version = "3.1", features = ["derive"] }
 rs48_lib = { path = "../rs48_lib" }
