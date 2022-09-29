@@ -1,14 +1,20 @@
 use rand::{distributions::Standard, prelude::Distribution};
 
-use super::grid::Grid;
+use crate::game::Game;
 use std::{error::Error, fmt::Display};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Move {
 	LEFT,
 	RIGHT,
 	UP,
 	DOWN,
+}
+
+impl Move {
+	pub fn all() -> [Self; 4] {
+		[Self::LEFT, Self::RIGHT, Self::UP, Self::DOWN]
+	}
 }
 
 impl Distribution<Move> for Standard {
@@ -39,7 +45,7 @@ impl Display for ControllerError {
 impl Error for ControllerError {}
 
 pub trait Controller {
-	fn next_move(&mut self, grid: &Grid) -> Result<Move, ControllerError>;
+	fn next_move(&mut self, game: &Game) -> Result<Move, ControllerError>;
 
 	fn into_box(self) -> Box<dyn Controller>
 	where

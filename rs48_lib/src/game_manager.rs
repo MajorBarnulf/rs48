@@ -119,8 +119,7 @@ impl GameManager {
 	}
 
 	fn game_turn(&mut self) -> Result<(), GameError> {
-		let board = self.game.get_board();
-		let movement = self.controller.next_move(board)?;
+		let movement = self.controller.next_move(&self.game)?;
 		self.game.turn(movement)?;
 		Ok(())
 	}

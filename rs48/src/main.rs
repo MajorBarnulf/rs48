@@ -83,11 +83,10 @@ fn main() -> Result<(), GameError> {
 	let controller = match arguments.controller {
 		ControllerParam::Player => PlayerController::new().into_box(),
 		ControllerParam::Random => RandomController::new().into_box(),
-		ControllerParam::Simulated => todo!(),
+		ControllerParam::Simulated => SimulatedController::new(80, 50).into_box(),
 	};
 	let mut managed = GameManager::new(game_rules, manager_rules, controller);
 	let err = managed.play_all();
-	println!("color seed: {color_seed}");
 	err
 }
 

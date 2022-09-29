@@ -2,7 +2,7 @@ use std::io::{stdin, stdout};
 use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
 use super::{Controller, ControllerError, Move};
-use crate::grid::Grid;
+use crate::game::Game;
 
 pub struct PlayerController;
 
@@ -13,7 +13,7 @@ impl PlayerController {
 }
 
 impl Controller for PlayerController {
-	fn next_move(&mut self, _grid: &Grid) -> Result<Move, ControllerError> {
+	fn next_move(&mut self, _game: &Game) -> Result<Move, ControllerError> {
 		let stdin = stdin();
 		let mut _stdout = stdout()
 			.into_raw_mode()

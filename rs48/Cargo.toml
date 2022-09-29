@@ -1,6 +1,6 @@
 [package]
 name = "rs48"
-version = "1.1.0"
+version = "1.2.0"
 edition = "2021"
 description = "A game of 2048 that plays in the terminal as a TUI with a lot of configurability."
 license = "GPL-3.0"
@@ -9,6 +9,6 @@ repository = "https://github.com/MajorBarnulf/rs48"
 homepage = "https://github.com/MajorBarnulf/rs48"
 
 [dependencies]
-clap = { version = "3.1", features = ["derive"] }
-rs48_lib = "1.1"
-rand = "*"
+clap = { version = "3.2", features = ["derive"] }
+rs48_lib = { path = "../rs48_lib" }
+rand = "0.8"

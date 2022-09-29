@@ -5,6 +5,7 @@ use super::{
 	grid::Grid,
 };
 
+#[derive(Debug, Clone)]
 pub struct Rules {
 	size: usize,
 	spawn_per_turn: usize,
@@ -60,6 +61,7 @@ pub struct Game {
 	score: usize,
 	turn_index: usize,
 	spawn_per_turn: usize,
+	rules: Rules,
 }
 
 impl Game {
@@ -67,13 +69,14 @@ impl Game {
 		let Rules {
 			size,
 			spawn_per_turn,
-		} = rules;
+		} = rules.clone();
 
 		Self {
 			board: Grid::new(size),
 			score: 0,
 			turn_index: 0,
 			spawn_per_turn,
+			rules,
 		}
 	}
 
@@ -85,13 +88,16 @@ impl Game {
 		self.score
 	}
 
+	pub fn get_rules(&self) -> &Rules {
+		&self.rules
+	}
+
 	pub fn get_turn_index(&self) -> usize {
 		self.turn_index
 	}
 
 	pub fn turn(&mut self, movement: Move) -> Result<(), GameError> {
-		let move_score = self.perform_move(movement);
-		self.score += move_score;
+		self.perform_move(movement);
 		for _ in 0..self.spawn_per_turn {
 			self.spawn_random()?;
 		}
@@ -156,6 +162,7 @@ impl Game {
 				}
 			}
 		};
+		self.score += move_score;
 		move_score
 	}
 
