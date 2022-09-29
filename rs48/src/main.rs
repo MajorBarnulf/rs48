@@ -1,9 +1,9 @@
 use std::{fmt::Display, str::FromStr, time::Duration};
 
-use clap::{ArgEnum, Parser};
+use clap::Parser;
 use rs48_lib::prelude::*;
 
-#[derive(Clone, ArgEnum, Debug)]
+#[derive(Clone, Debug)]
 pub enum ControllerParam {
 	Player,
 	Random,
@@ -42,7 +42,7 @@ pub struct Arguments {
 	size: usize,
 
 	/// number of tiles that will spawn on the grid each turn
-	#[clap(long, default_value_t = 1)]
+	#[clap(short = 'w', long, default_value_t = 1)]
 	spawn: usize,
 
 	/// disable clearing the terminal to refresh the screen
@@ -50,15 +50,15 @@ pub struct Arguments {
 	no_clear: bool,
 
 	/// skips the refresh of that many turns, allow AIs to play faster
-	#[clap(long, default_value_t = 0)]
+	#[clap(short = 'k', long, default_value_t = 0)]
 	display_skips: usize,
 
 	/// delay in ms to add between each turns
-	#[clap(long, default_value_t = 0)]
+	#[clap(short, long, default_value_t = 0)]
 	delay: u64,
 
 	/// the controller to use for the game
-	#[clap(long, default_value_t = ControllerParam::Player)]
+	#[clap(short, long, default_value_t = ControllerParam::Player)]
 	controller: ControllerParam,
 
 	/// sets a seed for the color pattern, 0 for random, default is 35
@@ -81,13 +81,13 @@ fn main() -> Result<(), GameError> {
 		.turn_duration(Duration::from_millis(arguments.delay));
 
 	let controller = match arguments.controller {
-		ControllerParam::Player => PlayerController::new().into_box(),
-		ControllerParam::Random => RandomController::new().into_box(),
-		ControllerParam::Simulated => SimulatedController::new(80, 50).into_box(),
+		ControllerParam::Player => PlayerController::default().into_box(),
+		ControllerParam::Random => RandomController::default().into_box(),
+		ControllerParam::Simulated => SimulatedController::new(100, 20).into_box(),
 	};
 	let mut managed = GameManager::new(game_rules, manager_rules, controller);
-	let err = managed.play_all();
-	err
+
+	managed.play_all()
 }
 
 fn seed_or_random(input: u16) -> u16 {
