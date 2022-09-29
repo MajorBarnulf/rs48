@@ -60,6 +60,10 @@ pub struct Arguments {
 	/// the controller to use for the game
 	#[clap(long, default_value_t = ControllerParam::Player)]
 	controller: ControllerParam,
+
+	/// sets a seed for the color pattern, 0 for random, default is 35
+	#[clap(long, default_value_t = 35)]
+	color_seed: u16,
 }
 
 fn main() -> Result<(), GameError> {
@@ -69,8 +73,10 @@ fn main() -> Result<(), GameError> {
 		.size(arguments.size)
 		.spawn_per_turn(arguments.spawn);
 
+	let color_seed = seed_or_random(arguments.color_seed);
 	let manager_rules = ManagerRules::default()
 		.clear_term(!arguments.no_clear)
+		.color_seed(color_seed)
 		.display_skips(arguments.display_skips)
 		.turn_duration(Duration::from_millis(arguments.delay));
 
@@ -80,5 +86,15 @@ fn main() -> Result<(), GameError> {
 		ControllerParam::Simulated => todo!(),
 	};
 	let mut managed = GameManager::new(game_rules, manager_rules, controller);
-	managed.play_all()
+	let err = managed.play_all();
+	println!("color seed: {color_seed}");
+	err
+}
+
+fn seed_or_random(input: u16) -> u16 {
+	if input == 0 {
+		rand::random()
+	} else {
+		input
+	}
 }

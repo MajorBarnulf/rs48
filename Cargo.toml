@@ -1,2 +1,3 @@
 [workspace]
-members = ["rs48"]
+members = ["rs48", "rs48_lib"]
+

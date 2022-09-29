@@ -237,7 +237,8 @@ name = "rs48"
 version = "1.1.0"
 dependencies = [
  "clap",
- "rs48_lib",
+ "rand",
+ "rs48_lib 1.1.0",
 ]
 
 [[package]]
@@ -245,6 +246,14 @@ name = "rs48_lib"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2da34dd2475597325c46db60df6c4f27cdf773f2acba50d96668471ead6bd61c"
+dependencies = [
+ "rand",
+ "termion",
+]
+
+[[package]]
+name = "rs48_lib"
+version = "1.1.1"
 dependencies = [
  "rand",
  "termion",
