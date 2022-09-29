@@ -9,14 +9,23 @@ configurability and implements a few types of AI.
 
 Compiled with the [rustup toolchain](https://rustup.rs).
 
+### Installing
+```sh
+cargo install rs48
+```
+
+alternatively, you can clone this repo and build it yourself.
+
 ### Building
 
-```powershell
-cargo build
+```sh
+git clone "https://github.com/MajorBarnulf/rs48.git"
+cd rs48/rs48
+cargo build -r
 ```
 
 ### Running
 
-```powershell
-cargo run
+```sh
+cargo run -r
 ```
