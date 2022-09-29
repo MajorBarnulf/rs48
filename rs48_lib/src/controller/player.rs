@@ -4,13 +4,8 @@ use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 use super::{Controller, ControllerError, Move};
 use crate::game::Game;
 
+#[derive(Debug, Default)]
 pub struct PlayerController;
-
-impl PlayerController {
-	pub fn new() -> Self {
-		Self
-	}
-}
 
 impl Controller for PlayerController {
 	fn next_move(&mut self, _game: &Game) -> Result<Move, ControllerError> {

@@ -69,7 +69,7 @@ impl Game {
 		let Rules {
 			size,
 			spawn_per_turn,
-		} = rules.clone();
+		} = rules;
 
 		Self {
 			board: Grid::new(size),
