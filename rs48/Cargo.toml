@@ -1,6 +1,6 @@
 [package]
 name = "rs48"
-version = "1.2.0"
+version = "1.3.0"
 edition = "2021"
 description = "A game of 2048 that plays in the terminal as a TUI with a lot of configurability."
 license = "GPL-3.0"
