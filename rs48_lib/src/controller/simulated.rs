@@ -50,7 +50,6 @@ impl Controller for SimulatedController {
 			.collect();
 		scores.sort_by(|(_, a), (_, b)| b.cmp(a));
 
-		dbg!(&scores);
 		let (m, _) = scores.first().unwrap();
 		Ok(m.clone())
 	}
